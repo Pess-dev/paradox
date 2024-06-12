@@ -19,7 +19,7 @@ MonoBehaviour:
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1
-    Intensity: 0.5
+    Intensity: 0
     DirectLightingStrength: 0.25
     Radius: 0.25
     Samples: 0
@@ -122,10 +122,10 @@ MonoBehaviour:
   m_AssetVersion: 2
   m_OpaqueLayerMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 823
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 823
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0

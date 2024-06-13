@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[RequireComponent(typeof(Rigidbody))]
 public class GrabbableParent : InteractableParent {
     protected Rigidbody objRB;
     //protected Renderer objRenderer;
     [SerializeField]
     protected bool canTake = false;
+    public bool canGrab = true;
     [SerializeField]
     protected Vector3 takeOffset = Vector3.zero;
 

@@ -7,31 +7,23 @@ using UnityEngine.UIElements;
 public class Sandbox : MonoBehaviour
 {
     [SerializeField]
-    private CharacterController playerController;
-    [SerializeField]
-    private float playerSpeed = 0.1f;
+    private Transform target;
 
     [SerializeField]
     private Transform center;
-    [SerializeField]
-    private Transform terrain;
-    //private float terrainSpeed = 0.2f;
-
-    [SerializeField]
-    private float MoveDeadZoneDistance = 0.1f;
-    [SerializeField]
-    private float MoveMaxDistance = 5f;
-
-    //private Vector3 _startSandboxPosition = Vector3.zero;
     
-    //private Vector3 _lastPlayerPosition;
+    public Transform terrain;
+
 
     [SerializeField]
-    private bool sandboxMode = false;
+    private float targetDeadZoneDistance = 2.5f;
 
-    InputManager inputManager;
+    public bool sandboxMode = false;   
+    public bool isReady = false;
+
     public static Sandbox instance;
 
+    public Vector3 moveDelta {get; private set;} = Vector3.zero;
 
     void Awake(){
         if(instance == null){
@@ -43,48 +35,39 @@ public class Sandbox : MonoBehaviour
     }
 
     void Start(){
-        inputManager = InputManager.instance;
-       // _startSandboxPosition = terrain.position;
     }
 
-    void FixedUpdate(){
+    void Update(){
+        if (isReady && InputManager.instance.jumped)
+            sandboxMode = !sandboxMode;
+
+        if (!isReady)
+            sandboxMode = false;
 
         if (!sandboxMode)
+        {
+            MovementScript.movementScript.movementEnabled = true;
+            CameraScript.cameraScript.rotatingEnabled = true;
+            InteractionScript.interactionScript.isInteractionEnabled = true;
+            CameraShakeScript.cameraShakeScript.enabled = true;
             return;
-
-        //print(inputManager.moveDirectionWorld+" "+inputManager.lookDelta+" "+inputManager.jump+" "+inputManager.interact);
-
-        //_lastPlayerPosition = playerController.transform.position;
-
-
-        //Перемещение игрока
-        playerController.Move(inputManager.moveDirectionWorld * playerSpeed *Time.fixedDeltaTime);
-        
-        //Vector3 playerDelta = Vector3.ProjectOnPlane(playerObject._sandboxPosition, Vector3.up);
-        
-        //if (playerDelta.magnitude > MoveMaxDistance){
-        //     playerObject._sandboxPosition -= playerDelta.normalized * (playerDelta.magnitude-MoveMaxDistance);
-        //}
-
-
-        //Перемещение карты
-        Vector3 delta = Vector3.ProjectOnPlane(playerController.transform.position - center.position, Vector3.up);
-        if(delta.magnitude > MoveDeadZoneDistance){
-            terrain.position -= delta.normalized * (delta.magnitude-MoveDeadZoneDistance);
         }
-
-        // Vector3 boundDelta = Vector3.ProjectOnPlane(terrain.position -center.position  , Vector3.up);
-        // if (boundDelta.magnitude > Math.Abs(terrainSize-sandboxSize)){
-        //     terrain.position = terrain.position - boundDelta.normalized *(boundDelta.magnitude-Math.Abs(terrainSize-sandboxSize));
-        // }
+        else{
+            MovementScript.movementScript.movementEnabled = false;
+            CameraScript.cameraScript.rotatingEnabled = false;
+            InteractionScript.interactionScript.isInteractionEnabled = false;
+            CameraShakeScript.cameraShakeScript.enabled = false;
+        }
         
     }
-
-    public Vector3 GetPosition(Vector3 sandboxPosition){
-        return  terrain.position + sandboxPosition;
-    } 
-    
-    public Vector3 GetSandboxPosition(Vector3 position){
-        return  position - terrain.position;
+    void FixedUpdate(){
+        if (!sandboxMode)
+            return;
+        Vector3 delta = Vector3.ProjectOnPlane(target.position - center.position, Vector3.up);
+        if(delta.magnitude > targetDeadZoneDistance){
+            moveDelta = delta.normalized * (delta.magnitude-targetDeadZoneDistance);
+            terrain.position -= moveDelta;
+        }
     }
+
 }

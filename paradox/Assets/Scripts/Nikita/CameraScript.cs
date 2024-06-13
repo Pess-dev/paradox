@@ -24,6 +24,9 @@ public class CameraScript : MonoBehaviour {
     private float cameraTransitionSpeed = 7f;
     public Vector3 cameraTransitionPosition = Vector3.zero;
 
+    [HideInInspector]
+    public bool rotatingEnabled = true;
+
     private void Awake() {
         if (cameraScript == null)
             cameraScript = this;
@@ -40,6 +43,9 @@ public class CameraScript : MonoBehaviour {
     }
 
     private void Update() {
+        if (!rotatingEnabled)
+            return;
+
         #region RotationPart
         float XRotation = cameraMainTransform.localRotation.eulerAngles.x + inputManager.lookDelta.y * -1.2f * cameraSensitivityMultiplyer;
         if ((XRotation >= 75) & (XRotation < 200))

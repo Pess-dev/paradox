@@ -12,6 +12,8 @@ public class InteractableParent : MonoBehaviour
     }
     #endregion
 
+    public bool isInteractable = true;
+
     #region objTags
     [SerializeField]
     protected List<string> objTags;

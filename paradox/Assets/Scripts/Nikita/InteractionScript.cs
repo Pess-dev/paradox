@@ -10,6 +10,9 @@ public class InteractionScript : MonoBehaviour
     private InputManager inputManager;
     private UIScript uiScript;
     //private SceneManagerScript sceneManager;
+
+    public bool isInteractionEnabled = true;
+
     #endregion
 
     private Transform cameraTransform;
@@ -114,22 +117,32 @@ public class InteractionScript : MonoBehaviour
 
     private void Update() {
         #region RayCast
-        Collider[] colliders = Physics.OverlapSphere(cameraTransform.position, interactionRadius, interactionLayerMask);
+        
         raycastInteractableScript = null;
+        if (!isInteractionEnabled)
+        {
+            uiScript.SetInteractImagePosition(Vector3.zero);
+            return;
+        } 
+            
+        Collider[] colliders = Physics.OverlapSphere(cameraTransform.position, interactionRadius, interactionLayerMask);
         foreach (Collider item in colliders) {
-            if (item.GetComponent<InteractableParent>() == null) 
+            if (item.GetComponentInParent<InteractableParent>() == null) 
                 continue;
-                
+
+            if (!item.GetComponentInParent<InteractableParent>().isInteractable)
+                continue;
+            
             float angle = Vector3.Angle(cameraTransform.forward, item.transform.position - cameraTransform.position);
             
             if (raycastInteractableScript == null)
                 { if (angle <= interactionAngle && Vector3.Dot(cameraTransform.forward, item.transform.position - cameraTransform.position) > 0)
-                    raycastInteractableScript = item.GetComponent<InteractableParent>();}
+                    raycastInteractableScript = item.GetComponentInParent<InteractableParent>();}
             else
             {
                 float oldAngle = Vector3.Angle(cameraTransform.forward, raycastInteractableScript.transform.position - cameraTransform.position);
                 if (angle <= interactionAngle && angle < oldAngle && Vector3.Dot(cameraTransform.forward, item.transform.position - cameraTransform.position) > 0)
-                    raycastInteractableScript = item.GetComponent<InteractableParent>();
+                    raycastInteractableScript = item.GetComponentInParent<InteractableParent>();
             }
         }
         
@@ -172,7 +185,7 @@ public class InteractionScript : MonoBehaviour
             raycastGrabbableScript = null;
         }
 
-        if (inputManager.grabbed && !grabbedObj.IsGrabbing() && raycastGrabbableScript != null) {
+        if (inputManager.grabbed && !grabbedObj.IsGrabbing() && raycastGrabbableScript != null && raycastGrabbableScript.canGrab) {
             grabbedObj.grabbableScript = raycastGrabbableScript;
             grabbedObj.grabOffset = raycastGrabbableScript.ObjRB.transform.InverseTransformPoint(raycastGrabbableScript.transform.position);
             grabbedObj.distance = Vector3.Magnitude(raycastGrabbableScript.transform.position - cameraTransform.position);
@@ -184,8 +197,7 @@ public class InteractionScript : MonoBehaviour
         #region Take/ReleaseNewObj
         if (inputManager.taked) {
             if (takenObj.IsHolding()) {
-                if (smoothReleaseObjectCoroutine == null)
-                    smoothReleaseObjectCoroutine = StartCoroutine(SmoothReleaseObject());
+                ReleaseObject();//smoothReleaseObjectCoroutine = StartCoroutine(SmoothReleaseObject());
             } else {
                 if (grabbedObj.IsGrabbing() && grabbedObj.grabbableScript.CanTake) {
                     GrabbableParent tempInteractionScript = grabbedObj.grabbableScript;
@@ -218,6 +230,21 @@ public class InteractionScript : MonoBehaviour
 
             takenObj.takeableScript.ObjRB.Sleep();
         }
+    }
+
+    private void ReleaseObject(){
+        Vector3 targetPos = CameraScript.cameraScript.transform.position;
+        targetPos -= CameraScript.cameraScript.transform.up * 0.3f;
+        Quaternion targetRot = takenObj.takeableScript.ObjRB.transform.rotation * 
+            Quaternion.Euler(new Vector3((Random.value * 2 - 1) * 15f, (Random.value * 2 - 1) * 30f, (Random.value * 2 - 1) * 15f));
+        takenObj.takeableScript.ObjRB.transform.position = targetPos;
+        // while (Vector3.SqrMagnitude(targetPos - takenObj.takeableScript.ObjRB.transform.position) >= 0.01f) {
+        //     takenObj.takeableScript.ObjRB.transform.position = Vector3.Lerp(takenObj.takeableScript.ObjRB.transform.position, targetPos, Time.deltaTime * 30f);
+        //     takenObj.takeableScript.ObjRB.transform.rotation = Quaternion.Lerp(takenObj.takeableScript.ObjRB.transform.rotation, targetRot, Time.deltaTime * 7f);
+        //     yield return new WaitForEndOfFrame();
+        // }
+        takenObj.RemoveTaken();
+        smoothReleaseObjectCoroutine = null;
     }
 
     private IEnumerator SmoothReleaseObject() {

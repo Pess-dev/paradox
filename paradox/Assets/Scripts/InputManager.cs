@@ -25,7 +25,7 @@ public class InputManager : MonoBehaviour
     public Vector2 lookDelta { get; private set; } = Vector2.zero;
     public float scroll { get; private set; } = 0;
 
-    public bool jump { get; private set; } = false;
+    public bool jumped { get; private set; } = false;
 
     public bool sprint { get; private set; } = false;
     public bool crouch { get; private set; } = false;
@@ -44,6 +44,7 @@ public class InputManager : MonoBehaviour
         taked = false;
         interacted = false;
         grabbed = false;
+        jumped = false;
     }
 
     void OnMove(InputValue value){
@@ -54,7 +55,7 @@ public class InputManager : MonoBehaviour
         lookDelta = value.Get<Vector2>() * lookSensitivity;
     }
     void OnJump(InputValue value){
-        jump = value.isPressed;
+        jumped = value.isPressed;
     }
     
     void OnRun(InputValue value){

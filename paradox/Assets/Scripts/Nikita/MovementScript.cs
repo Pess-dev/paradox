@@ -55,6 +55,9 @@ public class MovementScript : MonoBehaviour
     [SerializeField]
     private LayerMask floorMask;
 
+    [HideInInspector]
+    public bool movementEnabled = true;
+
     //  междусценье
     public void TeleportPlayer(Vector3 pos) {
         RaycastHit hit;
@@ -84,6 +87,10 @@ public class MovementScript : MonoBehaviour
     }
 
     private void LateUpdate() {
+        if (!movementEnabled)
+            return;
+
+
         CheckMovementState();
 
         Vector3 move = new Vector3(inputManager.moveInput.x * 0.625f, -2.5f,

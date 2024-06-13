@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Stencil
-  m_Shader: {fileID: 4800000, guid: 626b55f83ad5d174cad112a4d9ff6671, type: 3}
+  m_Name: ShaderMask 1
+  m_Shader: {fileID: 4800000, guid: 8e400019d8d6b214ba936644a916bc41, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -38,7 +38,7 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _CullMode: 1
+    - _CullMode: 0
     - _StencilID: 1
     m_Colors:
     - _CubeMax: {r: 0.5, g: 0.5, b: 0.5, a: 0}

@@ -8,18 +8,22 @@ Shader "Custom/StencilMask"
 
     SubShader
     {
+        //Tags { "RenderType"="Opaque" "Queue"="Geometry-1" "RenderPipeline" = "UniversalPipeline"}
         Tags { "RenderType"="Opaque" "Queue"="Geometry-1" "RenderPipeline" = "UniversalPipeline"}
 
         Pass 
         {
             Blend Zero One
             ZWrite Off
+            //ColorMask 0
+            //ZWrite On
             Cull [_CullMode]
 
             Stencil
             {
                 Ref [_StencilID]
-                Comp Always
+                //Comp Always
+                Comp Greater
                 Pass Replace
             }
         }
